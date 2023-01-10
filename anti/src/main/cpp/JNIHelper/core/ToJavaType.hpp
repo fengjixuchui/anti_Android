@@ -11,8 +11,7 @@
 #include <string>
 #include <jni.h>
 
-namespace jh
-{
+namespace jh {
     /**
     * Structure that provides some information about internal types.
     *
@@ -22,18 +21,19 @@ namespace jh
     * @param className The class name (path?) of 'T' type, if it is some default/custom java type.
     */
     template<class T>
-    struct ToJavaType
-    {
+    struct ToJavaType {
         using Type = jobject;
         using CallReturnType = jobject;
 
-        static std::string signature()
-        {
+        static std::string signature() {
             return T::signature();
         }
 
-        static std::string className()
-        {
+        static jobject initValue() {
+            return nullptr;
+        }
+
+        static std::string className() {
             return T::className();
         }
     };
@@ -42,13 +42,15 @@ namespace jh
     * Structure that provides some information about void type.
     */
     template<>
-    struct ToJavaType<void>
-    {
+    struct ToJavaType<void> {
         using Type = void;
         using CallReturnType = void;
 
-        static std::string signature()
-        {
+        static jobject initValue() {
+            return nullptr;
+        }
+
+        static std::string signature() {
             return "V";
         }
     };
@@ -57,13 +59,15 @@ namespace jh
     * Structure that provides some information about bool type.
     */
     template<>
-    struct ToJavaType<bool>
-    {
+    struct ToJavaType<bool> {
         using Type = jboolean;
         using CallReturnType = jboolean;
 
-        static std::string signature()
-        {
+        static bool initValue() {
+            return false;
+        }
+
+        static std::string signature() {
             return "Z";
         }
     };
@@ -72,13 +76,15 @@ namespace jh
     * Structure that provides some information about int type.
     */
     template<>
-    struct ToJavaType<int>
-    {
+    struct ToJavaType<int> {
         using Type = jint;
         using CallReturnType = jint;
 
-        static std::string signature()
-        {
+        static int initValue() {
+            return 0;
+        }
+
+        static std::string signature() {
             return "I";
         }
     };
@@ -87,13 +93,15 @@ namespace jh
     * Structure that provides some information about long type.
     */
     template<>
-    struct ToJavaType<long>
-    {
+    struct ToJavaType<long> {
         using Type = jlong;
         using CallReturnType = jlong;
 
-        static std::string signature()
-        {
+        static long initValue() {
+            return 0;
+        }
+
+        static std::string signature() {
             return "J";
         }
     };
@@ -102,13 +110,15 @@ namespace jh
     * Structure that provides some information about float type.
     */
     template<>
-    struct ToJavaType<float>
-    {
+    struct ToJavaType<float> {
         using Type = jfloat;
         using CallReturnType = jfloat;
 
-        static std::string signature()
-        {
+        static float initValue() {
+            return 0;
+        }
+
+        static std::string signature() {
             return "F";
         }
     };
@@ -117,13 +127,15 @@ namespace jh
     * Structure that provides some information about double type.
     */
     template<>
-    struct ToJavaType<double>
-    {
+    struct ToJavaType<double> {
         using Type = jdouble;
         using CallReturnType = jdouble;
 
-        static std::string signature()
-        {
+        static double initValue() {
+            return 0;
+        }
+
+        static std::string signature() {
             return "D";
         }
     };
@@ -132,8 +144,7 @@ namespace jh
     * Structure that describes a type that can be casted to jobject.
     */
     template<class JavaType>
-    struct JPointerLike
-    {
+    struct JPointerLike {
         using Type = JavaType;
         using CallReturnType = jobject;
     };
@@ -142,15 +153,12 @@ namespace jh
     * Structure that provides some information about jobject type.
     */
     template<>
-    struct ToJavaType<jobject> : public JPointerLike<jobject>
-    {
-        static std::string className()
-        {
+    struct ToJavaType<jobject> : public JPointerLike<jobject> {
+        static std::string className() {
             return "java/lang/Object";
         }
 
-        static std::string signature()
-        {
+        static std::string signature() {
             return "L" + className() + ";";
         }
     };
@@ -159,15 +167,16 @@ namespace jh
     * Structure that provides some information about jstring type.
     */
     template<>
-    struct ToJavaType<jstring> : public JPointerLike<jstring>
-    {
-        static std::string className()
-        {
+    struct ToJavaType<jstring> : public JPointerLike<jstring> {
+        static jstring initValue() {
+            return nullptr;
+        }
+
+        static std::string className() {
             return "java/lang/String";
         }
 
-        static std::string signature()
-        {
+        static std::string signature() {
             return "L" + className() + ";";
         }
     };
@@ -178,12 +187,10 @@ namespace jh
     * @param ElementType The corresponding JNI type of the elements inside this array.
     */
     template<class JavaElementType>
-    struct JavaArray
-    {
+    struct JavaArray {
         using ElementType = JavaElementType;
 
-        static std::string signature()
-        {
+        static std::string signature() {
             return "[" + ToJavaType<JavaElementType>::signature();
         }
     };
@@ -191,10 +198,8 @@ namespace jh
     /**
     * Structure that describes the types of custom java arrays.
     */
-    template<>
     template<class JavaType>
-    struct ToJavaType<JavaArray<JavaType>> : public JavaArray<JavaType>
-    {
+    struct ToJavaType<JavaArray<JavaType>> : public JavaArray<JavaType> {
         using Type = jobjectArray;
         using CallReturnType = jobjectArray;
     };
@@ -203,43 +208,44 @@ namespace jh
     * Structure that provides some information about jbooleanArray type.
     */
     template<>
-    struct ToJavaType<jbooleanArray> : public JavaArray<jboolean>, public JPointerLike<jbooleanArray>
-    { };
+    struct ToJavaType<jbooleanArray>
+            : public JavaArray<jboolean>, public JPointerLike<jbooleanArray> {
+    };
 
     /**
     * Structure that provides some information about jintArray type.
     */
     template<>
-    struct ToJavaType<jintArray> : public JavaArray<jint>, public JPointerLike<jintArray>
-    { };
+    struct ToJavaType<jintArray> : public JavaArray<jint>, public JPointerLike<jintArray> {
+    };
 
     /**
     * Structure that provides some information about jlongArray type.
     */
     template<>
-    struct ToJavaType<jlongArray> : public JavaArray<jlong>, public JPointerLike<jlongArray>
-    { };
+    struct ToJavaType<jlongArray> : public JavaArray<jlong>, public JPointerLike<jlongArray> {
+    };
 
     /**
     * Structure that provides some information about jfloatArray type.
     */
     template<>
-    struct ToJavaType<jfloatArray> : public JavaArray<jfloat>, public JPointerLike<jfloatArray>
-    { };
+    struct ToJavaType<jfloatArray> : public JavaArray<jfloat>, public JPointerLike<jfloatArray> {
+    };
 
     /**
     * Structure that provides some information about jdoubleArray type.
     */
     template<>
-    struct ToJavaType<jdoubleArray> : public JavaArray<jdouble>, public JPointerLike<jdoubleArray>
-    { };
+    struct ToJavaType<jdoubleArray> : public JavaArray<jdouble>, public JPointerLike<jdoubleArray> {
+    };
 
     /**
     * Structure that provides some information about jobjectArray type.
     */
     template<>
-    struct ToJavaType<jobjectArray> : public JavaArray<jobject>, public JPointerLike<jobjectArray>
-    { };
+    struct ToJavaType<jobjectArray> : public JavaArray<jobject>, public JPointerLike<jobjectArray> {
+    };
 }
 
 #endif

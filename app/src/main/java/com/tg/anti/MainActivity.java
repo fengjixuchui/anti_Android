@@ -7,11 +7,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-
-    static {
-        System.loadLibrary("native-lib");
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +14,7 @@ public class MainActivity extends Activity {
 
         TextView frida = findViewById(R.id.frida);
         frida.setText(AntiFrida());
+
         TextView xposed = findViewById(R.id.xposed);
         xposed.setText(AntiXposed());
 

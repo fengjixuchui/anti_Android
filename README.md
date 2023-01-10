@@ -19,7 +19,9 @@ anti frida的灵感也是来自于这里。就是将mmap一个只读的libc到ma
 `Anti Frida`只对frida attach模式攻击的对抗。
 
 ## Anti Xposed/like Xposed
-
+思路来源：
+- https://blog.canyie.top/2021/05/01/anti-magisk-xposed/
+- https://github.com/vvb2060/XposedDetector
 ## Anti Root
 
 ## Anti Debug
@@ -43,3 +45,10 @@ Virtual App 会在自己的文件系统中创建一个文件目录，通过这�
 基于svc来获得app的安装目录，防止被hook（除内核层面）。
 
 ## Anti Emulator
+思路来源：https://bbs.pediy.com/thread-255672.htm
+
+# Thanks
+- [xCrash](https://github.com/iqiyi/xCrash)
+- [JNIHelper](https://github.com/kvintessence/JNIHelper)
+- [XposedDetector](https://github.com/vvb2060/XposedDetector)
+- [AntiDebugandMemoryDump](https://github.com/darvincisec/AntiDebugandMemoryDump)
